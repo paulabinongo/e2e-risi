@@ -27,6 +27,16 @@ async loginAsRole(role: RoleType){
     await this.passwordInput.fill(account.password);
     await this.signInButton.click();
 }
+
+async loginWithMismatchedCredentials(usernameInput = 'alphatest@mailinator.com', passwordInput = 'wrongPassword123!'){
+    await this.usernameInput.fill(usernameInput);
+    await this.passwordInput.fill(passwordInput);
+    await this.signInButton.click();
 }
 
-
+async loginWithNonExistingUser(usernameInput = 'Non-Existing User', passwordInput = 'Password123!'){
+    await this.usernameInput.fill(usernameInput);
+    await this.passwordInput.fill(passwordInput);
+    await this.signInButton.click();
+}
+}
