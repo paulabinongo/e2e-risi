@@ -1,0 +1,115 @@
+/**
+ * ============================================================================
+ * PLAYWRIGHT E2E AUTOMATION FRAMEWORK STRUCTURE
+ * ============================================================================
+ * 
+ * This document provides a simple, high-level overview of our End-to-End (E2E) 
+ * automation framework architecture. Use this guide to understand how files 
+ * interact and to confidently present the design decisions to the team.
+ * 
+ * ----------------------------------------------------------------------------
+ * CORE ARCHITECTURE OVERVIEW
+ * ----------------------------------------------------------------------------
+ * 
+ * Our framework is built using the Page Object Model (POM) design pattern 
+ * combined with a Dynamic Configuration Engine.
+ * 
+ * Instead of hardcoding URLs, selectors, and credentials inside the tests, 
+ * the entire system adapts dynamically based on the terminal flags passed 
+ * at runtime (such as APP=sales ENV=dev).
+ * 
+ * ----------------------------------------------------------------------------
+ * FILE-BY-FILE BREAKDOWN
+ * ----------------------------------------------------------------------------
+ * 
+ * 1. playwright.config.ts (The Control Center)
+ *    - What it does: This is the core settings file for Playwright. It defines 
+ *      how tests run, which browsers to open (such as Chromium), timeouts, 
+ *      and reporting configurations.
+ *    - Why it is smart: It initiates dotenv at the very beginning of the 
+ *      lifecycle. This ensures our local configuration variables are securely 
+ *      loaded into memory before any test execution begins.
+ * 
+ * 2. .env (The Vault)
+ *    - What it does: Stores sensitive, environment-specific key-value entries 
+ *      (such as system passwords and usernames) completely separate from our 
+ *      public application logic.
+ *    - Why it is smart: Keeps secrets out of source control (Git) while using 
+ *      a strict naming pattern (such as APP_ENV_ROLE_USERNAME) to feed the 
+ *      dynamic configuration engine.
+ * 
+ * 3. config/environment.ts (The Dynamic Brain)
+ *    - What it does: Acts as the registry map for the entire infrastructure. 
+ *      It maps subdomains, URLs, page titles, and DOM elements for both the 
+ *      Sales and Pricing applications across all server stages (local, dev, 
+ *      staging, prod).
+ *    - Why it is smart: Contains the getCredentials() engine. It dynamically 
+ *      constructs variable strings based on your terminal input at runtime, 
+ *      fetching the correct user credentials out of the .env context without 
+ *      manual code updates.
+ * 
+ * 4. integration/pages/base.page.ts (The Blueprint Parent)
+ *    - What it does: The baseline class that every specific page layout 
+ *      inherits from. It houses universal browser action abstractions such as 
+ *      navigating to routes (navigateTo) or validating window tab headers 
+ *      (verifyLoginPageTitle).
+ *    - Why it is smart: Reduces boilerplate repetition. If a core framework 
+ *      command behavior changes later, we only update it here once rather 
+ *      than across dozens of scattered files.
+ * 
+ * 5. integration/pages/login.page.ts (The Login Component Page Object)
+ *    - What it does: Extends BasePage and defines the exact behaviors of our 
+ *      authentication screen. It reads selectors dynamically from our 
+ *      environment registry and contains reusable user workflows like 
+ *      loginAsRole().
+ *    - Why it is smart: Separates how to interact with the UI from the test 
+ *      logic itself. If the technical UI tags change tomorrow, the test 
+ *      scripts stay untouched—you only change the selectors in the config.
+ * 
+ * 6. logging_with_correct_credentials.spec.ts (The Functional Test Script)
+ *    - What it does: The actual executable test suite. It coordinates our 
+ *      reusable page components into a clean, human-readable user story loop 
+ *      (Open portal, submit user credentials, assert dashboard arrival).
+ *    - Why it is smart: Highly readable and entirely declarative. It contains 
+ *      no messy element locators or hardcoded credentials, making it robust 
+ *      against test flakiness.
+ * 
+ * ----------------------------------------------------------------------------
+ * HOW DATA FLOWS (THE LIFECYCLE)
+ * ----------------------------------------------------------------------------
+ * 
+ * When you trigger a test command like:
+ * "APP=sales ENV=dev ROLE=admin npx playwright test"
+ * 
+ * Data flows sequentially across these zones:
+ * 
+ *   [Terminal Flags] -> passes data to -> [playwright.config.ts]
+ *                                                 |
+ *                                          (loads .env file)
+ *                                                 v
+ *   [login.page.ts]  <- resolves keys via <- [environment.ts]
+ *          |
+ *   (locates fields dynamically)
+ *          v
+ *   [Browser UI Engine Runs] -> verifies and asserts Dashboard success!
+ * 
+ * ----------------------------------------------------------------------------
+ * KEY TALKING POINTS FOR PRESENTATIONS
+ * ----------------------------------------------------------------------------
+ * 
+ * When explaining this architecture to stakeholders or developers, emphasize 
+ * these three main benefits:
+ * 
+ * - Maintainability: UI element alterations only require a single-line 
+ *   update inside our configuration registries. Test specifications remain 
+ *   completely untouched.
+ * 
+ * - Scalability: Adding an entirely new application module (like a Logistics 
+ *   App) simply means appending a new section block to the APP_REGISTRY 
+ *   object. The tests automatically support it.
+ * 
+ * - Security: Hardcoded credentials are completely eliminated from the 
+ *   codebase via our segregated environment token mapping strategy.
+ * 
+ * ============================================================================
+ */
