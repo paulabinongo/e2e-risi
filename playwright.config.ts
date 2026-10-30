@@ -34,10 +34,11 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    headless: false,
-    launchOptions: {
-      slowMo: 1000 // Slows down actions by 1s so you can see if text is typed
-    }
+    headless: process.env.CI ? true : false,
+   launchOptions: {
+      // Keep slowMo on your local computer, but turn it off in CI to speed up the run
+      slowMo: process.env.CI ? 0 : 1000 
+   } 
   },
 
 
