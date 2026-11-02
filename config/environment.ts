@@ -11,17 +11,6 @@ interface Credentials {
     password: string;
 }
 
-interface AppConfig {
-    urls: Record<EnvType, string>;
-    loginRoute: string;
-    pageTitle: string;
-    selectors: {
-        usernameInput: string;
-        passwordInput: string;
-        signInButton: string;
-    };
-}
-
 export const currentApp = (process.env.APP || 'sales').toLowerCase() as AppType;
 export const currentEnv = (process.env.ENV || 'dev').toLowerCase() as EnvType;
 export const currentRole = (process.env.ROLE || 'admin').toLowerCase() as RoleType;
@@ -37,7 +26,18 @@ export const selectors = {
     usernameInput: process.env.SHARED_SELECTOR_USERNAME || 'input[type="email"]',
     passwordInput: process.env.SHARED_SELECTOR_PASSWORD || 'input[type="password"]',
     signInButton: process.env.SHARED_SELECTOR_SIGN_IN_BTN || 'button[type="submit"]',
+    showButton: process.env.SHARED_SELECTOR_SHOW_EYE_BTN || 'button[type="button"]',
+    hideButton: process.env.SHARED_SELECTOR_HIDE_EYE_BTN || 'button[type="button"]',
+    userMenuButton: process.env.SHARED_SELECTOR_USER_MENU_BTN || 'button.flex.items-center.gap-3.w-full.px-3.py-3',
+    logoutButton: process.env.SHARED_SELECTOR_LOGOUT_BTN || 'button[role="menuItem"]:has-text("Logout")',
 };
+
+export const negativeTestCredentials = {
+    mismatchedUsername: process.env.MISMATCHED_USERNAME || 'ddd@mail.com',
+    mismatchedPassword: process.env.MISMATCHED_PASSWORD || 'password123',
+    nonExistingUsername: process.env.NON_EXISTING_USERNAME || 'test@test.com',
+    nonExistingPassword: process.env.NON_EXISTING_PASSWORD || 'password123',
+}
 
 export const capitalizedApp = currentApp.charAt(0).toUpperCase() + currentApp.slice(1);
 
