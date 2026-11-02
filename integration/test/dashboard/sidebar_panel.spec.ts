@@ -1,4 +1,4 @@
-import {test, expect} from '@playwright/test';
+import {Page, test, expect} from '@playwright/test';
 import { LoginPage } from '../../pages/login.page';
 import { DashboardPage } from '../../pages/dashboard.page';
 import { currentRole, capitalizedApp } from '../../../config/environment';
@@ -21,6 +21,14 @@ test.describe('Dashbord Page Functional Tests', () => {
 
       test("User should be able to be redirected to the My Activity Sidebar page", async ({page}) => {
         await dashboardPage.verifyMyActivityIsVisible();
+    })
+
+    test("User should be able to be redirected to the Market Share Sidebar page", async ({page}) => {
+        await dashboardPage.verifyMarketShareIsVisible();
+    })
+
+    test("User should be able to be redirected to the Encoding Sidebar page", async ({page}) => {
+        await dashboardPage.verifyEncodingIsVisible();
     })
 
 })
