@@ -1,5 +1,5 @@
 import {Page, test, expect} from '@playwright/test';
-import { LoginPage } from '../../pages/Login.page';
+import { LoginPage } from '../../pages/login.page';
 import { DashboardPage } from '../../pages/dashboard.page';
 import { currentRole, capitalizedApp } from '../../../config/environment';
 
