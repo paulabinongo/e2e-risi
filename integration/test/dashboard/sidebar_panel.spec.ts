@@ -3,6 +3,8 @@ import { LoginPage } from '../../pages/login.page';
 import { DashboardPage } from '../../pages/dashboard.page';
 import { currentRole, capitalizedApp } from '../../../config/environment';
 
+test.describe.configure({ mode: 'serial' });
+
 test.describe('Dashbord Page Functional Tests', () => {
     let loginPage: LoginPage;
     let dashboardPage: DashboardPage;
@@ -29,6 +31,46 @@ test.describe('Dashbord Page Functional Tests', () => {
 
     test("User should be able to be redirected to the Encoding Sidebar page", async ({page}) => {
         await dashboardPage.verifyEncodingIsVisible();
+    })
+
+    test("User should be able to be redirected to the Leads Sidebar page", async ({page}) => {
+        await dashboardPage.verifyLeadsIsVisible();
+    })
+
+    test("User should be able to be redirected to the Quotations Sidebar page", async ({page}) => {
+        await dashboardPage.verifyQuotationsIsVisible();
+    })
+
+    test("User should be able to be redirected to the Sales Orders Sidebar page", async ({page}) => {
+        await dashboardPage.verifySalesOrdersIsVisible();
+    })
+
+    test("User should be able to be redirected to the Sales Audit Sidebar page", async ({page}) => {
+        await dashboardPage.verifySalesAuditIsVisible();
+    })
+
+    test("User should be able to be redirected to the Service Requests Sidebar page", async ({page}) => {
+        await dashboardPage.verifyServiceRequestsIsVisible();
+    })
+
+    test("User should be able to be redirected to the Job Orders Sidebar page", async ({page}) => {
+        await dashboardPage.verifyJobOrdersIsVisible();
+    })
+
+    test("User should be able to be redirected to the Directory Sidebar page", async ({page}) => {
+        await dashboardPage.verifyDirectoryIsVisible();
+    })
+
+    test("User should be able to be redirected to the Inventory Sidebar page", async ({page}) => {
+        await dashboardPage.verifyInventoryIsVisible();
+    })
+
+    test("User should be able to be redirected to the Reports Sidebar page", async ({page}) => {
+        await dashboardPage.verifyReportsIsVisible();
+    })
+
+    test("User should be able to be redirected to the Settings Sidebar page", async ({page}) => {
+        await dashboardPage.verifySettingsIsVisible();
     })
 
 })
