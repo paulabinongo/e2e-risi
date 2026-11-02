@@ -1,4 +1,4 @@
-import {test, expect} from '@playwright/test';
+import {Page, test, expect} from '@playwright/test';
 import { LoginPage } from '../../pages/login.page';
 import { currentRole, capitalizedApp } from '../../../config/environment';
 
@@ -12,6 +12,10 @@ test.describe('Login Page Functional Tests', () => {
     test(`User should be able to login to the ${capitalizedApp} App - Login Page with the correct credentials`, async ({page}) => {
         await loginPage.openPortal();
         await loginPage.loginAsRole(currentRole);
+        await loginPage.waitForLoginPageToLoad
+        await loginPage.clickUserMenuButton();
+        await loginPage.waitForLoginPageToLoad();
+        await loginPage.clickLogoutButton();
     });
 
     test(`User should not be able to login to the ${capitalizedApp} App - Login Page with the mismatched credentials`, async ({page}) => {
