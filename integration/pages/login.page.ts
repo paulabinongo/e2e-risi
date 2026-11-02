@@ -1,5 +1,5 @@
 import {Page, Locator, expect} from '@playwright/test';
-import {BasePage} from './base.page';
+import {BasePage} from './Base.page';
 import {selectors, loginRoute, pageTitle, getCredentials, RoleType, negativeTestCredentials} from '../../config/environment';
 
 export class LoginPage extends BasePage {

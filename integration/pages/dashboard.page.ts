@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from '@playwright/test'
-import { BasePage } from './base.page'
+import { BasePage } from './Base.page'
 
 export class DashboardPage extends BasePage {
     readonly dashboardSidebar: Locator;
