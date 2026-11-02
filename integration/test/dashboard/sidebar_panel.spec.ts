@@ -17,6 +17,10 @@ test.describe('Dashbord Page Functional Tests', () => {
         await loginPage.loginAsRole(currentRole);
     })
 
+    test("User should be able to be redirected to the Notifications page", async ({page}) => {
+        await dashboardPage.verifyNotificationsIsVisible();
+    })
+
     test("User should be able to be redirected to the Dashboard page", async ({page}) => {
         await dashboardPage.verifyDashboardIsVisible();
     })

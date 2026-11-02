@@ -16,6 +16,7 @@ export class DashboardPage extends BasePage {
     readonly inventorySidebar: Locator;
     readonly reportsSidebar: Locator;
     readonly settingsSidebar: Locator;
+    readonly notificationsSidebar: Locator;
 
     constructor(page: Page) {
         super(page)
@@ -34,6 +35,7 @@ export class DashboardPage extends BasePage {
         this.inventorySidebar = page.getByText('Inventory', { exact: true });
         this.reportsSidebar = page.getByText('Reports', { exact: true });
         this.settingsSidebar = page.getByText('Settings', { exact: true });
+        this.notificationsSidebar = page.getByText('Notifications', { exact: true });
     }
 
     async verifyDashboardIsVisible() {
@@ -105,5 +107,10 @@ export class DashboardPage extends BasePage {
     async verifySettingsIsVisible() {
         await expect(this.settingsSidebar).toBeVisible({ timeout: 6000 });
         await this.settingsSidebar.click();
+    }
+
+    async verifyNotificationsIsVisible() {
+        await expect(this.notificationsSidebar).toBeVisible({ timeout: 6000 });
+        await this.notificationsSidebar.click();
     }
 }
