@@ -16,6 +16,7 @@ test.describe('Create Quotations Page Functional Tests', () => {
     });
 
     test(`User should be able to create a new quotation in the ${capitalizedApp} App - Quotations Page`, async ({page}) => {
-        await quotationsPage.verifyCreateNewQuotation();
+        await quotationsPage.verifyNewQuotationButtonIsVisible()
+        await quotationsPage.verifyNewQuotationTextIsVisible()
     });
 });
