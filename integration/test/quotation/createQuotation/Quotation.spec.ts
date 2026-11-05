@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 import { LoginPage } from '../../../pages/login.page';
-import { QuotationsPage } from '../../../pages/Quotations.page';
+import { QuotationsPage } from '../../../pages/quotations.page';
 import { currentRole, capitalizedApp } from '../../../../config/environment';
 
 test.describe('Create Quotations Page Functional Tests', () => {
