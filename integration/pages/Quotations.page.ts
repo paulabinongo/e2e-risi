@@ -20,7 +20,7 @@ export class QuotationsPage extends BasePage {
         // this.selectDynamicQuotationCard = page.getByRole('button', { name: 'We\'re delighted to present our quotation for your review. Regan Use this' });
         this.preambleTextField = page.getByRole('textbox', { name: 'Defaults from the selected' })
         this.quotationDateField = page.getByRole('textbox', { name: 'Quotation date' });
-        this.useThisButton = page.getByText('USE THIS');
+        this.useThisButton = page.getByRole('button', {name: 'USE THIS'});
         this.purposeQuotationButtons = {
             buying: page.getByTestId('quotation-purpose-buying').filter({ hasText: 'For buying'}),
             estimates: page.getByTestId('quotation-purpose-estimate').filter({ hasText: 'For estimate'}),
@@ -49,13 +49,20 @@ export class QuotationsPage extends BasePage {
     }
 
     async selectQuotationCard(cardName: string){
-        const quotationCard = this.getQuotationCard(cardName)
-        await quotationCard.click();
+        await this.getQuotationCard(cardName).click();
     }
 
     async selectCardByIndex(index:number){
         await this.useThisButton.nth(index).click()
 
+    }
+
+    async selectRandomQuotationCard(){
+        const countCard = await this.useThisButton.count();
+        expect (countCard).toBeGreaterThan(0);
+
+        const randomIndex = Math.floor(Math.random() * countCard);
+        await this.selectCardByIndex(randomIndex);
     }
 
     async selectQuotationPurpose(purpose: 'buying' | 'estimates'){
