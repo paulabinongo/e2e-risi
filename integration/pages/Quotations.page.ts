@@ -8,7 +8,10 @@ export class QuotationsPage extends BasePage {
     readonly preambleTextField: Locator;
     readonly quotationDateField: Locator;
     readonly useThisButton: Locator;
-    
+    readonly purposeQuotationButtons: {
+        buying: Locator;
+        estimates: Locator;
+    }
     constructor(page: Page) {
         super(page)
         this.quotationsSidebar = page.getByText('Quotations', { exact: true });
@@ -18,6 +21,10 @@ export class QuotationsPage extends BasePage {
         this.preambleTextField = page.getByRole('textbox', { name: 'Defaults from the selected' })
         this.quotationDateField = page.getByRole('textbox', { name: 'Quotation date' });
         this.useThisButton = page.getByText('USE THIS');
+        this.purposeQuotationButtons = {
+            buying: page.getByTestId('quotation-purpose-buying').filter({ hasText: 'For buying'}),
+            estimates: page.getByTestId('quotation-purpose-estimate').filter({ hasText: 'For estimate'}),
+        }; 
     }
 
 
@@ -50,4 +57,15 @@ export class QuotationsPage extends BasePage {
         await this.useThisButton.nth(index).click()
 
     }
+
+    async selectQuotationPurpose(purpose: 'buying' | 'estimates'){
+        const targetButton = this.purposeQuotationButtons[purpose];
+        await targetButton.click();
+        await expect(targetButton).toBeVisible();
+        
+    }
+
 }
+
+
+
