@@ -1,5 +1,6 @@
-import {Page, Locator, expect} from '@playwright/test'
+import { Page, Locator, expect } from '@playwright/test'
 import { BasePage } from './Base.page'
+import { quotationPreambles } from '../../config/environment';
 
 export class QuotationsPage extends BasePage {
     readonly quotationsSidebar: Locator;
@@ -75,7 +76,10 @@ export class QuotationsPage extends BasePage {
     }
 
     async addPreambleText(){
-        await this.preambleTextField.fill('')
+        const randomPreamble = quotationPreambles[Math.floor(Math.random() * quotationPreambles.length)];
+        await this.preambleTextField.click();
+        await this.preambleTextField.clear();
+        await this.preambleTextField.pressSequentially(randomPreamble, { delay: 20 });
     }
 
     async selectQuotationPurpose(purpose: 'buying' | 'estimates'){

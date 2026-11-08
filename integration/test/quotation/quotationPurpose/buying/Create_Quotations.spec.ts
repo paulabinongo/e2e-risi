@@ -1,4 +1,4 @@
-import {test, expect} from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../../../pages/login.page';
 import { QuotationsPage } from '../../../../pages/quotations.page';
 import { currentRole, capitalizedApp } from '../../../../../config/environment';
@@ -22,10 +22,10 @@ test.describe('Create Quotations Page Functional Tests', () => {
         await quotationsPage.verifyNewQuotationButtonIsVisible();
         await quotationsPage.verifyNewQuotationButtonIsVisible();
         await quotationsPage.verifyNewQuotationTextIsVisible();
-        await quotationsPage.selectQuotationPurpose(purpose);
-       // await quotationsPage.addTextForPreambleField('This is a test preamble text for the quotation.');
-        await quotationsPage.selectRandomQuotationCard();
         await quotationsPage.verifyQuotationDateTime();
+        await quotationsPage.selectRandomQuotationCard();
+        await quotationsPage.selectQuotationPurpose(purpose);
+        await quotationsPage.addPreambleText();
         
 
     

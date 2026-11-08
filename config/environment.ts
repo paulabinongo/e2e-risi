@@ -50,3 +50,6 @@ export function getCredentials(role: RoleType = currentRole): Credentials {
         password: process.env[`${targetPrefix}_PASSWORD`] || '',
     };
 }
+
+export const quotationPreambles = (process.env.QUOTATION_PREAMBLES || '').split('|');
+
