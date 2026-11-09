@@ -6,25 +6,41 @@ export class QuotationsPage extends BasePage {
     readonly quotationsSidebar: Locator;
     readonly newQuotationButton: Locator;
     readonly newQuotationText: Locator;
-    readonly preambleTextField: Locator;
+    readonly preambleTextInputField: Locator;
     readonly quotationDateField: Locator;
     readonly useThisButton: Locator;
     readonly purposeQuotationButtons: {
         buying: Locator;
         estimates: Locator;
     }
+    readonly customerNameOrPhoneDetailInputField: Locator;
+    readonly customerNameOrPhoneDetailDropdownField: Locator;
+    readonly contactPersonDropdownField: Locator;
+    readonly companyNameInputField: Locator;
+    readonly companyContactNumberInputField: Locator;
+    readonly customerContactNumberInputField: Locator;
+
     constructor(page: Page) {
         super(page)
         this.quotationsSidebar = page.getByText('Quotations', { exact: true });
         this.newQuotationButton = page.getByRole('button', { name: 'New Quotation' });
         this.newQuotationText = page.getByRole('heading', { name: 'New Quotation' });
-        this.preambleTextField = page.getByRole('textbox', { name: 'Defaults from the selected' })
+        this.preambleTextInputField = page.getByRole('textbox', { name: 'Defaults from the selected' })
         this.quotationDateField = page.getByRole('textbox', { name: 'Quotation date' });
         this.useThisButton = page.getByRole('button', {name: 'USE THIS'});
         this.purposeQuotationButtons = {
             buying: page.getByTestId('quotation-purpose-buying').filter({ hasText: 'For buying'}),
             estimates: page.getByTestId('quotation-purpose-estimate').filter({ hasText: 'For estimate'}),
         }; 
+        this.customerNameOrPhoneDetailInputField = page.getByTestId('customer-picker-trigger');
+        this.customerNameOrPhoneDetailDropdownField = page.locator('.dropdown-menu, [role="listbox"], ul')
+            .locator('div, li')
+            .filter({ hasText: 'COMPANY' });
+        this.contactPersonDropdownField = page.getByLabel('Contact person');
+        this.companyNameInputField = page.getByRole('textbox', { name: 'Defaults from selected' });
+        this.companyContactNumberInputField = page.getByTestId('customer-company-phone');
+        this.customerContactNumberInputField = page.getByTestId('customer-contact-phone');
+
     }
 
 
@@ -77,9 +93,9 @@ export class QuotationsPage extends BasePage {
 
     async addPreambleText(){
         const randomPreamble = quotationPreambles[Math.floor(Math.random() * quotationPreambles.length)];
-        await this.preambleTextField.click();
-        await this.preambleTextField.clear();
-        await this.preambleTextField.pressSequentially(randomPreamble, { delay: 20 });
+        await this.preambleTextInputField.click();
+        await this.preambleTextInputField.clear();
+        await this.preambleTextInputField.pressSequentially(randomPreamble, { delay: 20 });
     }
 
     async selectQuotationPurpose(purpose: 'buying' | 'estimates'){
@@ -89,7 +105,31 @@ export class QuotationsPage extends BasePage {
         
     }
 
+      async selectCustomerName(){
+        await this.customerNameOrPhoneDetailInputField.click();
+        await this.customerNameOrPhoneDetailDropdownField.first().waitFor({ state: 'visible', timeout: 6000 });
+        await this.customerNameOrPhoneDetailDropdownField.last().scrollIntoViewIfNeeded();
+        await this.customerNameOrPhoneDetailDropdownField.first().scrollIntoViewIfNeeded();
+
+    
+
+        const customerCount = await this.customerNameOrPhoneDetailDropdownField.count();
+        await expect(customerCount).toBeGreaterThan(0);
+
+        const customerNameScroll = Math.floor(Math.random() * customerCount)
+        await this.customerNameOrPhoneDetailDropdownField.nth(customerNameScroll).scrollIntoViewIfNeeded();
+
+        const randomCustomerName = Math.floor(Math.random() * customerCount);
+        const targetCustomerName = this.customerNameOrPhoneDetailDropdownField.nth(randomCustomerName);
+
+        const fullRowText = await targetCustomerName.innerText();
+        const expectedCustomerName = fullRowText.replace('COMPANY', '').replace('Refresh list', '').trim();
+        await targetCustomerName.scrollIntoViewIfNeeded();
+        await targetCustomerName.click();
+        await expect(this.page.getByText(expectedCustomerName).first()).toBeVisible({ timeout: 5000 });
+
+
 }
 
-
+}
 

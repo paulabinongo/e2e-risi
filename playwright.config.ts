@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -24,21 +24,32 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  /* Reporter to use. See https://playwright.dev */
+  reporter: [['html', {open: 'never'}]],
   
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  /* Shared settings for all the projects below. See https://playwright.dev. */
   use: {
     /* Use the dynamic base URL determined by your APP and ENV variables */
-    baseURL: baseURL || process.env.BASE_URL || 'https://sales-dev.risi.biz',
+    baseURL: baseURL || process.env.BASE_URL || 'https://risi.biz',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    /* Collect trace when retrying the failed test. See https://playwright.dev */
     trace: 'on-first-retry',
-    headless: process.env.CI ? true : false,
-   launchOptions: {
+    
+    // Set to false so it launches visually on your desktop
+    headless: false,
+    
+    launchOptions: {
       // Keep slowMo on your local computer, but turn it off in CI to speed up the run
-      slowMo: process.env.CI ? 0 : 1000 
-   } 
+      slowMo: process.env.CI ? 0 : 1000, 
+      args: [
+        '--kiosk', // Forces native full screen on macOS, bypassing top menu and bottom dock gaps
+        '--no-sandbox',             
+        '--disable-gpu'             
+      ], 
+    },
+    
+    // Removing static viewport numbers allows the browser context to dynamically fill the maximized space natively
+    viewport: null, 
   },
 
 
@@ -46,44 +57,13 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        // ⚡ THE FIX: Explicitly target the chromium browser directly.
+        // Removing `...devices['Desktop Chrome']` completely cleans out hidden options
+        // like "deviceScaleFactor" that crash when combined with viewport: null.
+        browserName: 'chromium',
+        viewport: null, 
+      },
     },
-
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
 });

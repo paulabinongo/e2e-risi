@@ -26,7 +26,7 @@ test.describe('Create Quotations Page Functional Tests', () => {
         await quotationsPage.selectRandomQuotationCard();
         await quotationsPage.selectQuotationPurpose(purpose);
         await quotationsPage.addPreambleText();
-        
+        await quotationsPage.selectCustomerName();
 
     
 

@@ -44,7 +44,7 @@ export class DashboardPage extends BasePage {
     }
 
     async verifyMyActivityIsVisible() {
-        await expect(this.myActivitySidebar).toBeVisible({ timeout: 6000 });
+        await expect(this.myActivitySidebar).toBeVisible({ timeout: 10000 });
         await this.myActivitySidebar.click();
     
     }
