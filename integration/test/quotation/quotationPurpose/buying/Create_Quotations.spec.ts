@@ -27,9 +27,9 @@ test.describe('Create Quotations Page Functional Tests', () => {
         await quotationsPage.selectQuotationPurpose(purpose);
         await quotationsPage.addPreambleText();
         await quotationsPage.selectCustomerName();
+        await quotationsPage.verifyCustomerSectionData();
 
-    
-
-})
+    })
 }
-})
+}
+)
