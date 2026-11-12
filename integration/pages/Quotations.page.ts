@@ -20,6 +20,15 @@ export class QuotationsPage extends BasePage {
     readonly companyNameInputField: Locator;
     readonly companyContactNumberInputField: Locator;
     readonly customerContactNumberInputField: Locator;
+    readonly attentionInputField: Locator;
+    readonly projectInputField: Locator;
+    readonly vatInclusiveSelector: Locator;
+    readonly vatExclusiveSelector: Locator;
+    // readonly searchProductInputField: Locator;
+    // readonly codeGuideSelector: Locator;
+    // readonly browseCatalogSelector: Locator;
+    // readonly customLineSelector: Locator;
+    // readonly quantityInputField: Locator;
 
     constructor(page: Page) {
         super(page)
@@ -34,15 +43,19 @@ export class QuotationsPage extends BasePage {
             estimates: page.getByTestId('quotation-purpose-estimate').filter({ hasText: 'For estimate'}),
         }; 
         this.customerNameOrPhoneDetailInputField = page.getByTestId('customer-picker-trigger');
-        
-        // FIX: Treat the list container and list items as separate distinct locators
-        this.customerDropdownContainer = page.locator('.dropdown-menu, [role="listbox"], ul.dropdown-content').first();
-        this.customerDropdownItems = this.customerDropdownContainer.locator('div, li, [role="option"]');
-        
+        this.customerDropdownContainer = page.getByRole('listbox').locator('visible=true');
+        this.customerDropdownItems = this.customerDropdownContainer.getByRole('option');
+        this.customerDropdownContainer = page.getByRole('listbox').locator('visible=true');
+        this.customerDropdownItems = this.customerDropdownContainer.getByRole('option');
         this.contactPersonDropdownField = page.getByLabel('Contact person');
         this.companyNameInputField = page.getByRole('textbox', { name: 'Defaults from selected' });
         this.companyContactNumberInputField = page.getByTestId('customer-company-phone');
         this.customerContactNumberInputField = page.getByTestId('customer-contact-phone');
+        this.attentionInputField = page.getByRole('textbox', { name: 'e.g., Purchasing Department' });
+        this.projectInputField = page.getByRole('textbox', { name: 'e.g., Upgrading of Hagonoy' });
+        this.vatInclusiveSelector = page.getByRole('button', { name: 'VAT inclusive' });
+        this.vatExclusiveSelector = page.getByRole('button', { name: 'VAT exclusive' });
+
     }
 
     async verifyNewQuotationButtonIsVisible() {
@@ -83,6 +96,7 @@ export class QuotationsPage extends BasePage {
     }
 
     async selectRandomQuotationCard(){
+        await expect(this.useThisButton.first()).toBeVisible({timeout: 8000});
         const countCard = await this.useThisButton.count();
         expect (countCard).toBeGreaterThan(0);
 
@@ -104,37 +118,38 @@ export class QuotationsPage extends BasePage {
     }
 
     async selectCustomerName(){
-        // 1. Click to open the custom dropdown list
         await this.customerNameOrPhoneDetailInputField.click();
-        
-        // 2. Wait for the list container to show up
-        await this.customerDropdownContainer.waitFor({ state: 'visible', timeout: 6000 });
-
-        // 3. Count available rows inside the picker
+        await this.customerDropdownContainer.waitFor({ state: 'visible', timeout: 8000 });
         const customerCount = await this.customerDropdownItems.count();
         await expect(customerCount).toBeGreaterThan(0);
-
-        // 4. Select a completely random list item index
         const randomCustomerIndex = Math.floor(Math.random() * customerCount);
         const targetCustomerName = this.customerDropdownItems.nth(randomCustomerIndex);
-
-        // 5. Clean text values up for the assertion string
         const fullRowText = await targetCustomerName.innerText();
         const expectedCustomerName = fullRowText.replace('COMPANY', '').replace('Refresh list', '').trim();
-        
-        // 6. Explicitly scroll target option into view container bounds, then click it
         await targetCustomerName.scrollIntoViewIfNeeded();
         await targetCustomerName.click();
-        
-        // 7. Verify the UI updated with your choice
         await expect(this.page.getByText(expectedCustomerName).first()).toBeVisible({ timeout: 5000 });
     }
 
-    async verifyCustomerSectionData() {
+    async verifyOtherCustomerDetailsSection() {
         await this.companyContactNumberInputField.waitFor({ state: 'visible', timeout: 5000 });
-        await expect(this.companyNameInputField).toHaveValue(/^.*$/);
         await expect(this.contactPersonDropdownField).toBeVisible();
-        await expect(this.customerContactNumberInputField).toHaveValue(/^(—|.*)$/);
+        await expect(this.companyNameInputField).toHaveValue(/^.*$/);
         await expect(this.companyContactNumberInputField).toHaveValue(/^(No number on file|.*)$/);
+        await expect(this.customerContactNumberInputField).toHaveValue(/^(—|.*)$/);
+    }
+
+    async productWithVATInclusive(){
+        await this.vatInclusiveSelector.waitFor({state: 'visible', timeout: 6000});
+        await expect(this.vatInclusiveSelector).toBeVisible();
+        await this.vatInclusiveSelector.click();
+        await expect(this.vatInclusiveSelector).toHaveAttribute('aria-pressed', 'true');
+    }
+
+    async productWithVATExclusive(){
+        await this.vatExclusiveSelector.waitFor({state: 'visible', timeout: 6000});
+        await expect(this.vatExclusiveSelector).toBeVisible();
+        await this.vatExclusiveSelector.click();
+        await expect(this.vatExclusiveSelector).toHaveAttribute('aria-pressed', 'true');
     }
 }

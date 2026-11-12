@@ -1,6 +1,7 @@
 export type AppType = 'sales' | 'pricing';
 export type EnvType = 'local' | 'dev' | 'staging' | 'prod';
 export type RoleType = 'admin' | 'manager' | 'guest';
+export type QuotationPurposeType = 'buying' | 'estimates';
 
 declare const process: {
     env: Record<string, string | undefined>;
@@ -40,6 +41,7 @@ export const negativeTestCredentials = {
 }
 
 export const capitalizedApp = currentApp.charAt(0).toUpperCase() + currentApp.slice(1);
+export const quotationPurpose = (process.env.QUOTATION_PURPOSE || 'buying').toLowerCase() as QuotationPurposeType;
 
 export function getCredentials(role: RoleType = currentRole): Credentials {
     const roleUpper = role.toUpperCase();
