@@ -1,6 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test'
 import { BasePage } from './Base.page'
-import { quotationPreambles } from '../../config/environment';
+import { discountThreshold, quotationPreambles } from '../../config/environment';
 
 export class QuotationsPage extends BasePage {
     readonly quotationsSidebar: Locator;
@@ -24,8 +24,16 @@ export class QuotationsPage extends BasePage {
     readonly projectInputField: Locator;
     readonly vatInclusiveSelector: Locator;
     readonly vatExclusiveSelector: Locator;
-    // readonly searchProductInputField: Locator;
-    // readonly codeGuideSelector: Locator;
+    readonly searchProductInputField: Locator;
+    readonly codeGuideSelector: Locator;
+    readonly codeGuideModal: Locator;
+    readonly codeGuideFilterInputField: Locator;
+    readonly discountInputField: Locator;
+    readonly applyDiscountButton: Locator;
+    readonly resetDiscountButton: Locator;
+    readonly discountModalForBossApproval: Locator;
+    readonly continueButtonForDiscountModalForBossApproval: Locator;
+    readonly discountAppliedRows: Locator;
     // readonly browseCatalogSelector: Locator;
     // readonly customLineSelector: Locator;
     // readonly quantityInputField: Locator;
@@ -45,8 +53,6 @@ export class QuotationsPage extends BasePage {
         this.customerNameOrPhoneDetailInputField = page.getByTestId('customer-picker-trigger');
         this.customerDropdownContainer = page.getByRole('listbox').locator('visible=true');
         this.customerDropdownItems = this.customerDropdownContainer.getByRole('option');
-        this.customerDropdownContainer = page.getByRole('listbox').locator('visible=true');
-        this.customerDropdownItems = this.customerDropdownContainer.getByRole('option');
         this.contactPersonDropdownField = page.getByLabel('Contact person');
         this.companyNameInputField = page.getByRole('textbox', { name: 'Defaults from selected' });
         this.companyContactNumberInputField = page.getByTestId('customer-company-phone');
@@ -55,13 +61,23 @@ export class QuotationsPage extends BasePage {
         this.projectInputField = page.getByRole('textbox', { name: 'e.g., Upgrading of Hagonoy' });
         this.vatInclusiveSelector = page.getByRole('button', { name: 'VAT inclusive' });
         this.vatExclusiveSelector = page.getByRole('button', { name: 'VAT exclusive' });
+        this.discountInputField = page.getByPlaceholder('Enter discount %')
+        this.applyDiscountButton = page.getByRole('button', {name: 'Add Discount'});
+        this.resetDiscountButton = page.getByRole('button', {name: 'Reset'});
+        this.discountModalForBossApproval = page.getByText('This puts the total discount');
+        this.continueButtonForDiscountModalForBossApproval = page.getByRole('button', { name: 'Continue' });
+        this.discountAppliedRows = page.locator('span').filter({ hasText: /(1st|2nd|3rd|\d+th) discount/i });
+        this.searchProductInputField = page.getByRole('combobox', { name: 'Search products' });
+        this.codeGuideSelector = page.getByRole('button', { name: 'Code guide' });
+        this.codeGuideModal = page.getByText('Code guide×');
+        this.codeGuideFilterInputField = page.getByRole('button', { name: 'Code guide' });
 
     }
 
     async verifyNewQuotationButtonIsVisible() {
-        await expect(this.quotationsSidebar).toBeVisible({ timeout: 6000 });
+        await expect(this.quotationsSidebar).toBeVisible({ timeout: 15000 });
         await this.quotationsSidebar.click();
-        await expect(this.newQuotationButton).toBeVisible({ timeout: 6000 });
+        await expect(this.newQuotationButton).toBeVisible({ timeout: 8000 });
         await this.newQuotationButton.scrollIntoViewIfNeeded();
         await this.newQuotationButton.waitFor({ state: 'visible', timeout: 6000 });
         await this.newQuotationButton.click();
@@ -118,14 +134,20 @@ export class QuotationsPage extends BasePage {
     }
 
     async selectCustomerName(){
-        await this.customerNameOrPhoneDetailInputField.click();
-        await this.customerDropdownContainer.waitFor({ state: 'visible', timeout: 8000 });
+        await expect(async () => {
+            await this.customerNameOrPhoneDetailInputField.click();
+            await this.customerDropdownContainer.waitFor({state: 'visible', timeout: 6000})
+        }).toPass({timeout: 15000});
+
+
         const customerCount = await this.customerDropdownItems.count();
         await expect(customerCount).toBeGreaterThan(0);
+
         const randomCustomerIndex = Math.floor(Math.random() * customerCount);
         const targetCustomerName = this.customerDropdownItems.nth(randomCustomerIndex);
         const fullRowText = await targetCustomerName.innerText();
         const expectedCustomerName = fullRowText.replace('COMPANY', '').replace('Refresh list', '').trim();
+        
         await targetCustomerName.scrollIntoViewIfNeeded();
         await targetCustomerName.click();
         await expect(this.page.getByText(expectedCustomerName).first()).toBeVisible({ timeout: 5000 });
@@ -151,5 +173,51 @@ export class QuotationsPage extends BasePage {
         await expect(this.vatExclusiveSelector).toBeVisible();
         await this.vatExclusiveSelector.click();
         await expect(this.vatExclusiveSelector).toHaveAttribute('aria-pressed', 'true');
+    }
+
+    async getProductByCode(){
+        await this.codeGuideSelector.click();
+        await expect(this.codeGuideModal).toBeVisible();
+        // await this.codeGuideFilterInputField.
+    }
+
+    async proceedWithDiscount(discount: number = 0){
+        
+        await this.discountInputField.fill(discount.toString());
+        await expect(this.applyDiscountButton).toBeEnabled();
+        await this.applyDiscountButton.click();
+        //         await expect(this.applyDiscountButton).toBeVisible();
+        // await expect(this.discountAppliedRows).toHaveCount(discount);
+    }
+
+    async applyDiscounts(discounts: number[]){
+       if (discounts.length === 0){
+         await expect(this.discountAppliedRows).toHaveCount(0);
+         await expect(this.discountModalForBossApproval).not.toBeVisible();
+         return;
+       }
+
+       let cumulativeDiscount = 0;
+    
+       for (let i = 0; i < discounts.length; i++){
+        const discountValue = Number(discounts[i]);
+        cumulativeDiscount +=discountValue;
+
+        await this.discountInputField.click();
+        await this.discountInputField.clear();
+        await this.discountInputField.fill(String(discountValue));
+        await this.applyDiscountButton.click();
+
+        if (cumulativeDiscount > discountThreshold){
+            await expect(this.discountModalForBossApproval).toBeVisible({timeout: 6000});
+            await this.continueButtonForDiscountModalForBossApproval.click();
+            await expect(this.discountModalForBossApproval).not.toBeVisible();
+        } else {
+            await expect(this.discountModalForBossApproval).not.toBeVisible();      
+        }
+        const appliedRowInput = this.discountAppliedRows.nth(i).getByRole('spinbutton');
+        await expect(appliedRowInput).toHaveValue(String(discountValue));
+        await expect(this.discountAppliedRows).toHaveCount(i + 1);
+    }
     }
 }

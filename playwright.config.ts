@@ -13,7 +13,7 @@ export default defineConfig({
   testDir: './integration',
   
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
@@ -22,7 +22,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 2 : 1,
   
   /* Reporter to use. See https://playwright.dev */
   reporter: [['html', {open: 'never'}]],

@@ -55,3 +55,27 @@ export function getCredentials(role: RoleType = currentRole): Credentials {
 
 export const quotationPreambles = (process.env.QUOTATION_PREAMBLES || '').split('|');
 
+export const discountThreshold = Number(process.env.DISCOUNT_THRESHOLD ?? 3);
+export const getRandomDiscount = (min: number, max: number): number => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export const standardDiscount =
+  process.env.STANDARD_DISCOUNT !== undefined && process.env.STANDARD_DISCOUNT !== ''
+    ? Number(process.env.STANDARD_DISCOUNT)
+    : getRandomDiscount(1, discountThreshold - 1);
+
+export const bossApprovalDiscount =
+  process.env.BOSS_APPROVAL_DISCOUNT !== undefined && process.env.BOSS_APPROVAL_DISCOUNT !== ''
+    ? Number(process.env.BOSS_APPROVAL_DISCOUNT)
+    : getRandomDiscount(discountThreshold + 1, 100);
+
+export const vatOptions = ['vatInclusive', 'vatExclusive'] as const;
+
+export const discountOptions = [
+    { type: 'noDiscount', name: 'No Discount'},
+    { type: 'singleStandard', name: `Single Discount (< ${discountThreshold}%)`},
+    { type: 'multipleStandard', name: `Multiple Discounts (< ${discountThreshold}% Total)`},
+    { type: 'singleBossApproval', name: `Sing;e Discount (> ${discountThreshold}% - Needs Boss Approval)`},
+    { type: 'multipleBossApproval', name: `Multiple Discounts (> ${discountThreshold}% Total - Needs Boss Approval)`}
+] as const;

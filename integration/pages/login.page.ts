@@ -37,6 +37,7 @@ async loginAsRole(role: RoleType){
     await this.showButton.click();
     await this.hideButton.click();
     await this.signInButton.click();
+    await this.page.waitForURL((url) => !url.pathname.includes('/login'),{timeout: 15000, waitUntil: 'domcontentloaded'});
 }
 
 async loginWithMismatchedCredentials(usernameInput = negativeTestCredentials.mismatchedUsername, passwordInput = negativeTestCredentials.mismatchedPassword){
