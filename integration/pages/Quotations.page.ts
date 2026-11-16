@@ -208,6 +208,10 @@ export class QuotationsPage extends BasePage {
         await this.discountInputField.fill(String(discountValue));
         await this.applyDiscountButton.click();
 
+        if (discountValue === 0){
+            return;
+        }
+
         if (cumulativeDiscount > discountThreshold){
             await expect(this.discountModalForBossApproval).toBeVisible({timeout: 6000});
             await this.continueButtonForDiscountModalForBossApproval.click();

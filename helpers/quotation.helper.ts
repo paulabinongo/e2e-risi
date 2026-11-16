@@ -1,4 +1,5 @@
-import { bossApprovalDiscount, standardDiscount, getRandomDiscount } from "../config/environment";
+import { get } from "node:http";
+import { bossApprovalDiscount, singleStandardDiscount, getRandomDiscount, multipleStandardDiscounts, multipleBossApprovalDiscounts } from "../config/environment";
 import { QuotationsPage } from "../integration/pages/quotations.page";
 
 export async function fillFirstAndSecondQuoationForm(
@@ -30,13 +31,15 @@ export async function handleDiscount(
     if (discountType === 'noDiscount'){
         await quotationsPage.applyDiscounts([]);
     } else if (discountType === 'singleStandard') {
-        await quotationsPage.applyDiscounts([standardDiscount]);
+        await quotationsPage.applyDiscounts([singleStandardDiscount]);
     } else if (discountType == 'multipleStandard'){
-        await quotationsPage.applyDiscounts([1, 1]);
+        const rowCount = getRandomDiscount(2,4);
+        await quotationsPage.applyDiscounts(multipleStandardDiscounts(rowCount));
     } else if (discountType === 'singleBossApproval'){
-        await quotationsPage.applyDiscounts([bossApprovalDiscount]);
+        await quotationsPage.applyDiscounts([bossApprovalDiscount(100)]);
     } else if (discountType === 'multipleBossApproval'){
-        await quotationsPage.applyDiscounts([getRandomDiscount(1, 2), bossApprovalDiscount])
+        const rowCount = getRandomDiscount(2,4);
+        await quotationsPage.applyDiscounts(multipleBossApprovalDiscounts(rowCount));
     }
 }
 
